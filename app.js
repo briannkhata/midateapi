@@ -1,18 +1,15 @@
 const express = require("express");
-const path = require("path");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-app.use(express.static(path.join(__dirname, "./public")));
+const userRoutes = require("./src/user/routes");
+app.use(express.json());
 
-app.set("views", "./src/views");
-app.set("view engine", "ejs");
+app.get("/", (re, res) => {
+  res.send("Hello World");
+});
 
-const homeRouter = require('./src/routes/homeRouter');
-//homeRouter.route("/");
-app.use("/home", homeRouter);
-
-
+app.use("/api/v1/users/", userRoutes);
 
 app.listen(PORT, () => {
   console.log("Listening at port " + PORT);
