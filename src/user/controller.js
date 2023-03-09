@@ -141,6 +141,15 @@ const addPayment = (req, res) => {
     });
   };
 
+  const updateProfilePicture = (req, res) => {
+    const UserId = parseInt(req.params.id);
+    const { photo } = req.body;
+    pool.query(queries.updateProfilePicture, [photo,UserId], (error, results) => {
+      if (error) throw error;
+      res.status(201).json("Profile Picture updated successfully");
+    });
+  };
+
 module.exports = {
   getUsers,
   getUserById,
@@ -149,5 +158,6 @@ module.exports = {
   activateAccount,
   updateProfile,
   updatePassword,
-  addPayment
+  addPayment,
+  updateProfilePicture
 };
