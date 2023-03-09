@@ -17,7 +17,7 @@ const getUserById = (req, res) => {
 };
 
 const addUser = (req, res) => {
-  const { name, phone, password, country } = req.body;
+  const { name, phone, password,looking_for, country } = req.body;
 
   pool.query(queries.checkPhoneExists, [phone], (error, results) => {
     if (error) {
@@ -33,7 +33,7 @@ const addUser = (req, res) => {
 
   pool.query(
     queries.addUser,
-    [name, phone, password, country],
+    [name, phone, password, looking_for,country],
     (error, results) => {
       if (error) throw error;
       res.status(201).json("Account created successfully");
@@ -41,8 +41,39 @@ const addUser = (req, res) => {
   );
 };
 
+
+const deactivateAccount = (req, res) => {
+    const UserId = parseInt(req.params.id);
+    const date_closed = new Date();
+    const { reason_for_closing} = req.body;  
+    pool.query(
+      queries.deactivateAccount,
+      [reason_for_closing,date_closed],
+      (error, results) => {
+        if (error) throw error;
+        res.status(201).json("Account deactivated successfully");
+      }
+    );
+  };
+
+  const activateAccount = (req, res) => {
+    const UserId = parseInt(req.params.id);
+    const date_reopened = new Date();
+    const { reason_for_reopening} = req.body;  
+    pool.query(
+      queries.deactivateAccount,
+      [reason_for_reopening,date_reopened],
+      (error, results) => {
+        if (error) throw error;
+        res.status(201).json("Account Re-Activated successfully");
+      }
+    );
+  };
+
 module.exports = {
   getUsers,
   getUserById,
   addUser,
+  deactivateAccount,
+  activateAccount
 };
