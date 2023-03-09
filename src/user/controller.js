@@ -21,35 +21,30 @@ const addUser = (req, res) => {
     name,
     phone,
     password,
-    email,
-    photo,
-    gender,
-    looking_for,
-    age_from,
-    age_to,
-    dob,
-    role,
-    register_date,
-    location,
-    country,
-    district,
-    m_status,
-    dating_type,
-    hobies,
-    profession,
+    country
   } = req.body;
-  //check if phone already exixts
 
-
-
+  pool.query(queries.checkPhoneExists, [phone], (error, results) => {
   
-  pool.query(queries.addUser, [UserId], (error, results) => {
-    if (error) throw error;
-    res.status(200).json(results);
+    if (error) {
+        // handle error
+        return res.status(500).json({ error: "Internal server error" });
+      }
+      
+      if (results && results.length > 0) {
+        return res.status(409).json({ error: "Phone number already exists" });
+      }
   });
+  
+  pool.query(queries.addUser, [name,phone,password,country], (error, results) => {
+    if (error) throw error;
+    res.status(201).json("Account created successfully");
+  });
+
 };
 
 module.exports = {
   getUsers,
   getUserById,
+  addUser,
 };
