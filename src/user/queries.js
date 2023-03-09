@@ -4,7 +4,9 @@ const checkPhoneExists = "SELECT * FROM tblusers WHERE phone = ?";
 const addUser = "INSERT INTO tblusers (name, phone, password, country)  VALUES (?,?,?,?)";
 const deactivateAccount = "UPDATE tblusers SET  reason_for_closing = ? , date_closed = ?,deleted = 1 WHERE user_id = ?";
 const activateAccount = "UPDATE tblusers SET  reason_for_reopening = ? , date_reopened = ?,deleted = 0 WHERE user_id = ?";
+const updatePassword = "UPDATE tblusers SET  password = ?  WHERE user_id = ?";
 const updateProfile = "UPDATE tblusers SET  name = ? , email = ?, phone = 0 WHERE user_id = ?";
+const addPayment = "UPDATE tblusers SET  trans_id = ? , activation_code = ?, date_from = ?, date_to = ? WHERE user_id = ?";
 
 
 module.exports = {
@@ -14,5 +16,7 @@ module.exports = {
     addUser,
     deactivateAccount,
     activateAccount,
-    updateProfile
+    updateProfile,
+    updatePassword,
+    addPayment
 };

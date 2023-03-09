@@ -121,6 +121,26 @@ const updateProfile = (req, res) => {
   );
 };
 
+const updatePassword = (req, res) => {
+  const UserId = parseInt(req.params.id);
+  const { password } = req.body;
+  pool.query(queries.updatePassword, [password, UserId], (error, results) => {
+    if (error) throw error;
+    res.status(201).json("Password Updated successfully");
+  });
+};
+
+const addPayment = (req, res) => {
+    const UserId = parseInt(req.params.id);
+    const date_from = new Date();
+    const date_to = new Date();
+    const { trans_id,activation_code } = req.body;
+    pool.query(queries.addPayment, [trans_id, activation_code,date_from,date_to,UserId], (error, results) => {
+      if (error) throw error;
+      res.status(201).json("Payment done successfully");
+    });
+  };
+
 module.exports = {
   getUsers,
   getUserById,
@@ -128,4 +148,6 @@ module.exports = {
   deactivateAccount,
   activateAccount,
   updateProfile,
+  updatePassword,
+  addPayment
 };
