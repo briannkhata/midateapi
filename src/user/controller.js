@@ -131,24 +131,53 @@ const updatePassword = (req, res) => {
 };
 
 const addPayment = (req, res) => {
-    const UserId = parseInt(req.params.id);
-    const date_from = new Date();
-    const date_to = new Date();
-    const { trans_id,activation_code } = req.body;
-    pool.query(queries.addPayment, [trans_id, activation_code,date_from,date_to,UserId], (error, results) => {
+  const UserId = parseInt(req.params.id);
+  const date_from = new Date();
+  const date_to = new Date();
+  const { trans_id, activation_code } = req.body;
+  pool.query(
+    queries.addPayment,
+    [trans_id, activation_code, date_from, date_to, UserId],
+    (error, results) => {
       if (error) throw error;
       res.status(201).json("Payment done successfully");
-    });
-  };
+    }
+  );
+};
 
-  const updateProfilePicture = (req, res) => {
-    const UserId = parseInt(req.params.id);
-    const { photo } = req.body;
-    pool.query(queries.updateProfilePicture, [photo,UserId], (error, results) => {
+const updateProfilePicture = (req, res) => {
+  const UserId = parseInt(req.params.id);
+  const { photo } = req.body;
+  pool.query(
+    queries.updateProfilePicture,
+    [photo, UserId],
+    (error, results) => {
       if (error) throw error;
       res.status(201).json("Profile Picture updated successfully");
-    });
-  };
+    }
+  );
+};
+
+const logoutUser = (req, res) => {
+  req.session.destroy((err) => {
+    if (error) throw error;
+    res.redirect("/");
+  });
+};
+
+const loginUser = (req, res) => {
+  const { phone, password } = req.body;
+
+  pool.query(queries.loginUser, [phone, password], (error, results) => {
+    if (error) throw error;
+
+    if (results.length === 0) {
+      return res.status(401).send("Invalid username or password");
+    }
+    req.session.user = result[0];
+    res.redirect("/");
+  });
+};
 
 module.exports = {
   getUsers,
@@ -159,5 +188,7 @@ module.exports = {
   updateProfile,
   updatePassword,
   addPayment,
-  updateProfilePicture
+  updateProfilePicture,
+  logoutUser,
+  loginUser,
 };

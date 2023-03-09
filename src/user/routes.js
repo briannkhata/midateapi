@@ -12,6 +12,8 @@ user.put("/updateProfile/:id", controller.updateProfile);
 user.put("/updatePassword/:id", controller.updatePassword);
 user.put("/addPayment/:id", controller.addPayment);
 user.put("/updateProfilePicture/:id", controller.updateProfilePicture);
+user.post("/logoutUser/", controller.logoutUser);
+user.get("/loginUser/", controller.loginUser);
 
 
 module.exports = user;

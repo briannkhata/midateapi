@@ -8,6 +8,7 @@ const updatePassword = "UPDATE tblusers SET  password = ?  WHERE user_id = ?";
 const updateProfile =  "UPDATE tblusers SET  name = ? , email = ?, gender = ?,looking_for = ? ,age_from = ?, age_to = ?, dob = ?, about = ?, location = ?, country = ?,district = ?, m_status = ?, dating_type = ?, hobies= ?, profession = ?, church=? WHERE user_id = ?";
 const addPayment =  "UPDATE tblusers SET  trans_id = ? , activation_code = ?, date_from = ?, date_to = ? WHERE user_id = ?";
 const updateProfilePicture =  "UPDATE tblusers SET  photo = ?  WHERE user_id = ?";
+const loginUser = "SELECT * FROM tblusers WHERE phone = ? AND password = ?";
 
 
 module.exports = {
@@ -20,5 +21,6 @@ module.exports = {
   updateProfile,
   updatePassword,
   addPayment,
-  updateProfilePicture
+  updateProfilePicture,
+  loginUser
 };
