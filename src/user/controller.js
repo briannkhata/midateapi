@@ -17,30 +17,28 @@ const getUserById = (req, res) => {
 };
 
 const addUser = (req, res) => {
-  const {
-    name,
-    phone,
-    password,
-    country
-  } = req.body;
+  const { name, phone, password, country } = req.body;
 
   pool.query(queries.checkPhoneExists, [phone], (error, results) => {
-  
     if (error) {
-        // handle error
-        return res.status(500).json({ error: "Internal server error" });
-      }
-      
-      if (results && results.length > 0) {
-        return res.status(409).json({ error: "Phone number already exists" });
-      }
-  });
-  
-  pool.query(queries.addUser, [name,phone,password,country], (error, results) => {
-    if (error) throw error;
-    res.status(201).json("Account created successfully");
+      return res.status(500).json({ error: "Internal server error" });
+      req.end();
+    }
+
+    if (results && results.length > 0) {
+      return res.status(409).json({ error: "Phone number already exists" });
+      req.end();
+    }
   });
 
+  pool.query(
+    queries.addUser,
+    [name, phone, password, country],
+    (error, results) => {
+      if (error) throw error;
+      res.status(201).json("Account created successfully");
+    }
+  );
 };
 
 module.exports = {
