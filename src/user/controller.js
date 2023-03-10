@@ -221,7 +221,7 @@ const checkDeactivated = (req, res) => {
     const search = req.query;
     pool.query(queries.searchUsers, [search], (error, results) => {
       if (error) throw error;     
-      res.status(201).json({results});
+      res.status(201).json(results);
     });
   };
 
