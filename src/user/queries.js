@@ -20,7 +20,7 @@ const getDateTo = "SELECT user_id, date_to FROM tblusers WHERE deleted = 0 ";
 const getPlans = "SELECT * FROM tblplans WHERE deleted = 0";
 const getPlanPrice = "SELECT price FROM tblplans WHERE plan_id = ?";
 const getPlanDays = "SELECT days FROM tblplans WHERE plan_id = ?";
-
+const addActivations = "INSERT INTO tblactivations (date_activated, date_from,date_to,user_id,amount) VALUES (?,?,?,?,?)";
 
 
 
@@ -46,5 +46,6 @@ module.exports = {
   getDateTo,
   getPlans,
   getPlanPrice,
-  getPlanDays
+  getPlanDays,
+  addActivations
 };

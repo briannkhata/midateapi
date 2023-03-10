@@ -19,6 +19,8 @@ user.get("/getPlanDays/:id", controller.getPlanDays);
 user.post("/registerUser/", controller.addUser);
 user.post("/likeUser/", controller.likeUser);
 user.post("/logoutUser/", controller.logoutUser);
+user.post("/addActivations/", controller.addActivations);
+
 
 user.put("/deactivateAccount/:id", controller.deactivateAccount);
 user.put("/activateAccount/:id", controller.activateAccount);

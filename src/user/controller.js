@@ -121,6 +121,19 @@ const updateProfile = (req, res) => {
   );
 };
 
+const addActivations = (userId, dateFrom, dateTo,amount) => {
+  pool.query(
+    queries.addActivations,
+    [userId, date_activated, dateFrom, dateTo,amount],
+    (error, results) => {
+      if (error) {
+        return res.status(500).json({ error: "Could not add activation" });
+      }
+      return res.status(201).json({ status: "success" });
+    }
+  );
+};
+
 const updatePassword = (req, res) => {
   const UserId = parseInt(req.params.id);
   const { password } = req.body;
@@ -150,6 +163,8 @@ const getPlanPrice = async (planId) => {
       const dateTo = new Date(dateTo.setDate(dateFrom.getDate() + days));
       const activationCode = "MiDate" + Math.random().toString(36).substring(2);
       const { trans_id } = req.body;
+
+      addActivations(userId,dateFrom,dateFrom,dateTo,price);
       await pool.query(queries.addPayment, [trans_id, activationCode, dateFrom, dateTo, userId]);
       res.status(201).json("Payment done successfully");
     } catch (error) {
@@ -317,5 +332,6 @@ module.exports = {
   getDateTo,
   getPlans,
   getPlanPrice,
-  getPlanDays
+  getPlanDays,
+  addActivations
 };
