@@ -9,6 +9,11 @@ const updateProfile =  "UPDATE tblusers SET  name = ? , email = ?, gender = ?,lo
 const addPayment =  "UPDATE tblusers SET  trans_id = ? , activation_code = ?, date_from = ?, date_to = ? WHERE user_id = ?";
 const updateProfilePicture =  "UPDATE tblusers SET  photo = ?  WHERE user_id = ?";
 const loginUser = "SELECT * FROM tblusers WHERE phone = ? AND password = ?";
+const setToOnline = "UPDATE tblusers SET online = 1 WHERE user_id = ?";
+const setToOffline = "UPDATE tblusers SET online = 0 WHERE user_id = ?";
+const checkDeactivated = "SELECT deleted FROM tblusers WHERE user_id = ?";
+
+
 
 
 module.exports = {
@@ -22,5 +27,8 @@ module.exports = {
   updatePassword,
   addPayment,
   updateProfilePicture,
-  loginUser
+  loginUser,
+  setToOnline,
+  setToOffline,
+  checkDeactivated
 };

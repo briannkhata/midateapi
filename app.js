@@ -4,7 +4,14 @@ const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer')
+const session = require('express-session');
 
+
+app.use(session({
+  secret: 'brico',
+  resave: false,
+  saveUninitialized: true
+}));
 
 const PORT = process.env.PORT || 3000;
 const userRoutes = require("./src/user/routes");

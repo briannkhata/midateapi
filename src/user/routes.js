@@ -14,6 +14,11 @@ user.put("/addPayment/:id", controller.addPayment);
 user.put("/updateProfilePicture/:id", controller.updateProfilePicture);
 user.post("/logoutUser/", controller.logoutUser);
 user.get("/loginUser/", controller.loginUser);
+user.get("/checkDeactivated/:id", controller.checkDeactivated);
+user.put("/setOffline/:id", controller.setOffline);
+user.put("/setOnline/:id", controller.setOnline);
+
+
 
 
 module.exports = user;

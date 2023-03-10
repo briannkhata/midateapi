@@ -172,12 +172,21 @@ const loginUser = (req, res) => {
     if (error) throw error;
 
     if (results.length === 0) {
-      return res.status(401).send("Invalid username or password");
+        res.status(401).json({ status: "error", message: "Invalid Username or Password" });
     }
-    req.session.user = result[0];
-    res.redirect("/");
+    req.session.name = results.name;
+    req.session.username = results.username;
+    res.status(201).json({ status: "success", message: "Login successfull" });
   });
 };
+
+const checkDeactivated = (req, res) => {
+    const UserId = parseInt(req.params.id);
+      pool.query(queries.checkDeactivated, [UserId], (error, results) => {
+      if (error) throw error;     
+      res.status(201).json({results});
+    });
+  };
 
 module.exports = {
   getUsers,
@@ -191,4 +200,5 @@ module.exports = {
   updateProfilePicture,
   logoutUser,
   loginUser,
+  checkDeactivated
 };
