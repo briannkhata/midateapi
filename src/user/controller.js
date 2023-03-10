@@ -130,21 +130,35 @@ const updatePassword = (req, res) => {
   });
 };
 
-const addPayment = (req, res) => {
-  const UserId = parseInt(req.params.id);
-  const date_from = new Date();
-  const date_to = new Date();
-  const { trans_id, activation_code } = req.body;
-  pool.query(
-    queries.addPayment,
-    [trans_id, activation_code, date_from, date_to, UserId],
-    (error, results) => {
-      if (error) throw error;
+const getPlanPrice = async (planId) => {
+    const results = await pool.query(queries.getPlanPrice, [planId]);
+    return results.rows[0].price;
+  };
+  
+  const getPlanDays = async (planId) => {
+    const results = await pool.query(queries.getPlanDays, [planId]);
+    return results.rows[0].days;
+  };
+  
+  const addPayment = async (req, res) => {
+    try {
+      const userId = req.sessei(req.params.id);
+      const planId = req.body.plan_id;
+      const price = await getPlanPrice(planId);
+      const days = await getPlanDays(planId);
+      const dateFrom = new Date();
+      const dateTo = new Date(dateTo.setDate(dateFrom.getDate() + days));
+      const activationCode = "MiDate" + Math.random().toString(36).substring(2);
+      const { trans_id } = req.body;
+      await pool.query(queries.addPayment, [trans_id, activationCode, dateFrom, dateTo, userId]);
       res.status(201).json("Payment done successfully");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json("Error adding payment");
     }
-  );
-};
-
+  };
+ 
+  
 const updateProfilePicture = (req, res) => {
   const UserId = parseInt(req.params.id);
   const { photo } = req.body;
@@ -172,7 +186,9 @@ const loginUser = (req, res) => {
     if (error) throw error;
 
     if (results.length === 0) {
-        res.status(401).json({ status: "error", message: "Invalid Username or Password" });
+      res
+        .status(401)
+        .json({ status: "error", message: "Invalid Username or Password" });
     }
     req.session.name = results.name;
     req.session.username = results.username;
@@ -183,47 +199,101 @@ const loginUser = (req, res) => {
 };
 
 const checkDeactivated = (req, res) => {
-    const UserId = parseInt(req.params.id);
-      pool.query(queries.checkDeactivated, [UserId], (error, results) => {
-      if (error) throw error;     
-      res.status(201).json({results});
-    });
-  };
+  const UserId = parseInt(req.params.id);
+  pool.query(queries.checkDeactivated, [UserId], (error, results) => {
+    if (error) throw error;
+    res.status(201).json({ results });
+  });
+};
 
-  const setToOnline = (req, res) => {
-    const UserId = req.session.UserId;
-    pool.query(queries.setToOnline, [UserId], (error, results) => {
-      if (error) throw error;     
-      res.status(201).json({status:results});
-    });
-  };
+const setToOnline = (req, res) => {
+  const UserId = req.session.UserId;
+  pool.query(queries.setToOnline, [UserId], (error, results) => {
+    if (error) throw error;
+    res.status(201).json({ status: results });
+  });
+};
 
-  const setOffline = (req, res) => {
-    const UserId = req.session.UserId;
-    pool.query(queries.setToOffline, [UserId], (error, results) => {
-      if (error) throw error;     
-      res.status(201).json({status:results});
-    });
-  };
+const setToOffline = (req, res) => {
+  const UserId = req.session.UserId;
+  pool.query(queries.setToOffline, [UserId], (error, results) => {
+    if (error) throw error;
+    res.status(201).json({ status: results });
+  });
+};
 
-  
-  const resetPayment = (req, res) => {
-    //const UserId = req.session.UserId;
-    const UserId = parseInt(req.params.id);
-
-    pool.query(queries.resetPayment, [UserId], (error, results) => {
-      if (error) throw error;     
-      res.status(201).json({status:"Payment reset Successfull"});
-    });
-  };
-
-  const searchUsers = (req, res) => {
-    const search = req.query;
-    pool.query(queries.searchUsers, [search], (error, results) => {
-      if (error) throw error;     
+const getDateTo = (req, res) => {
+    pool.query(queries.getDateTo, (error, results) => {
+      if (error) throw error;
       res.status(201).json(results);
     });
   };
+
+
+  const resetPayment = (req, res) => {
+    const today = new Date();
+    getDateTo(req, res, (error, users) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Users not found" });
+      }
+      users.forEach((row) => {
+        const userId = row[0];
+        const dateTo = new Date(row[1]);
+  
+        if (today < dateTo) {
+          pool.query(queries.resetPayment, [userId], (error, results) => {
+            if (error) {
+              console.error(error);
+              return res.status(500).json({ message: "Internal Server Error" });
+            }
+            return res.status(201).json({ message: "Payment reset Successful" });
+          });
+        }
+      });
+    });
+  };
+
+
+const searchUsers = (req, res) => {
+  const search = req.query;
+  pool.query(queries.searchUsers, [search], (error, results) => {
+    if (error) throw error;
+    res.status(201).json(results);
+  });
+};
+
+const likeUser = (req, res) => {
+  const liked_by = req.session.UserId;
+  const { liked, operation } = req.body;
+  pool.query(
+    queries.likeUser,
+    [liked, liked_by, operation],
+    (error, results) => {
+      if (error) throw error;
+      res
+        .status(201)
+        .json({ status: "success", message: "User liked successfull" });
+    }
+  );
+};
+
+const getUserLikes = (req, res) => {
+  const UserId = parseInt(req.params.id);
+  pool.query(queries.getUserLikes, [UserId], (error, results) => {
+    if (error) throw error;
+    res.status(201).json(results);
+  });
+};
+
+
+const getPlans = (req, res) => {
+    pool.query(queries.getPlans, (error, results) => {
+      if (error) throw error;
+      res.status(201).json(results);
+    });
+  };
+  
 
 module.exports = {
   getUsers,
@@ -238,8 +308,14 @@ module.exports = {
   logoutUser,
   loginUser,
   checkDeactivated,
-  setOffline,
+  setToOffline,
   setToOnline,
   resetPayment,
-  searchUsers
+  searchUsers,
+  likeUser,
+  getUserLikes,
+  getDateTo,
+  getPlans,
+  getPlanPrice,
+  getPlanDays
 };

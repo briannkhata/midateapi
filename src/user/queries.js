@@ -14,6 +14,13 @@ const setToOffline = "UPDATE tblusers SET online = 0 WHERE user_id = ?";
 const checkDeactivated = "SELECT deleted FROM tblusers WHERE user_id = ?";
 const resetPayment =  "UPDATE tblusers SET  trans_id = null , activation_code = null, date_from = null, date_to = null WHERE user_id = ?";
 const searchUsers = "SELECT * FROM tblusers WHERE (name LIKE '%?%' OR location LIKE '%?%' OR age_from LIKE '%?%' OR age_to LIKE '%?%' OR gender LIKE '%?%')  AND deleted = 0";
+const likeUser = "INSERT INTO tbllikes (liked, liked_by, operation) VALUES (?,?,?)";
+const getUserLikes = "SELECT * FROM tbllikes WHERE liked = ? ";
+const getDateTo = "SELECT user_id, date_to FROM tblusers WHERE deleted = 0 ";
+const getPlans = "SELECT * FROM tblplans WHERE deleted = 0";
+const getPlanPrice = "SELECT price FROM tblplans WHERE plan_id = ?";
+const getPlanDays = "SELECT days FROM tblplans WHERE plan_id = ?";
+
 
 
 
@@ -33,5 +40,11 @@ module.exports = {
   setToOffline,
   checkDeactivated,
   resetPayment,
-  searchUsers
+  searchUsers,
+  likeUser,
+  getUserLikes,
+  getDateTo,
+  getPlans,
+  getPlanPrice,
+  getPlanDays
 };
