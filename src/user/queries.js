@@ -13,6 +13,7 @@ const setToOnline = "UPDATE tblusers SET online = 1 WHERE user_id = ?";
 const setToOffline = "UPDATE tblusers SET online = 0 WHERE user_id = ?";
 const checkDeactivated = "SELECT deleted FROM tblusers WHERE user_id = ?";
 const resetPayment =  "UPDATE tblusers SET  trans_id = null , activation_code = null, date_from = null, date_to = null WHERE user_id = ?";
+const searchUsers = "SELECT * FROM tblusers WHERE (name LIKE '%?%' OR location LIKE '%?%' OR age_from LIKE '%?%' OR age_to LIKE '%?%' OR gender LIKE '%?%')  AND deleted = 0";
 
 
 
@@ -31,5 +32,6 @@ module.exports = {
   setToOnline,
   setToOffline,
   checkDeactivated,
-  resetPayment
+  resetPayment,
+  searchUsers
 };

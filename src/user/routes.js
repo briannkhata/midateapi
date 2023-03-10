@@ -18,6 +18,7 @@ user.get("/checkDeactivated/:id", controller.checkDeactivated);
 user.put("/setOffline/:id", controller.setOffline);
 user.put("/setOnline/:id", controller.setToOnline);
 user.put("/resetPayment/:id", controller.resetPayment);
+user.get("/searchUsers/", controller.searchUsers);
 
 
 
