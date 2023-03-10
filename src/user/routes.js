@@ -16,7 +16,8 @@ user.post("/logoutUser/", controller.logoutUser);
 user.get("/loginUser/", controller.loginUser);
 user.get("/checkDeactivated/:id", controller.checkDeactivated);
 user.put("/setOffline/:id", controller.setOffline);
-user.put("/setOnline/:id", controller.setOnline);
+user.put("/setOnline/:id", controller.setToOnline);
+user.put("/resetPayment/:id", controller.resetPayment);
 
 
 

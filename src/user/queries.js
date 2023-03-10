@@ -12,7 +12,7 @@ const loginUser = "SELECT * FROM tblusers WHERE phone = ? AND password = ?";
 const setToOnline = "UPDATE tblusers SET online = 1 WHERE user_id = ?";
 const setToOffline = "UPDATE tblusers SET online = 0 WHERE user_id = ?";
 const checkDeactivated = "SELECT deleted FROM tblusers WHERE user_id = ?";
-
+const resetPayment =  "UPDATE tblusers SET  trans_id = null , activation_code = null, date_from = null, date_to = null WHERE user_id = ?";
 
 
 
@@ -30,5 +30,6 @@ module.exports = {
   loginUser,
   setToOnline,
   setToOffline,
-  checkDeactivated
+  checkDeactivated,
+  resetPayment
 };

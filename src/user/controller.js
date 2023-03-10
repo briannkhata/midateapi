@@ -176,6 +176,8 @@ const loginUser = (req, res) => {
     }
     req.session.name = results.name;
     req.session.username = results.username;
+    req.session.id = results.id;
+
     res.status(201).json({ status: "success", message: "Login successfull" });
   });
 };
@@ -185,6 +187,33 @@ const checkDeactivated = (req, res) => {
       pool.query(queries.checkDeactivated, [UserId], (error, results) => {
       if (error) throw error;     
       res.status(201).json({results});
+    });
+  };
+
+  const setToOnline = (req, res) => {
+    const UserId = req.session.UserId;
+    pool.query(queries.setToOnline, [UserId], (error, results) => {
+      if (error) throw error;     
+      res.status(201).json({status:results});
+    });
+  };
+
+  const setOffline = (req, res) => {
+    const UserId = req.session.UserId;
+    pool.query(queries.setToOffline, [UserId], (error, results) => {
+      if (error) throw error;     
+      res.status(201).json({status:results});
+    });
+  };
+
+  
+  const resetPayment = (req, res) => {
+    //const UserId = req.session.UserId;
+    const UserId = parseInt(req.params.id);
+
+    pool.query(queries.resetPayment, [UserId], (error, results) => {
+      if (error) throw error;     
+      res.status(201).json({status:"Payment reset Successfull"});
     });
   };
 
@@ -200,5 +229,8 @@ module.exports = {
   updateProfilePicture,
   logoutUser,
   loginUser,
-  checkDeactivated
+  checkDeactivated,
+  setOffline,
+  setToOnline,
+  resetPayment
 };
