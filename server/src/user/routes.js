@@ -5,7 +5,7 @@ const user = Router();
 
 user.get("/getAllUsers/", controller.getUsers);
 user.get("/getUserById/:id", controller.getUserById);
-user.get("/loginUser/", controller.loginUser);
+user.post("/loginUser/", controller.loginUser);
 user.get("/checkDeactivated/:id", controller.checkDeactivated);
 user.get("/searchUsers/", controller.searchUsers);
 user.get("/getUserLikes/:id", controller.getUserLikes);
