@@ -5,18 +5,26 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const getUsers = (req, res) => {
-  pool.query(queries.getUsers, (error, results) => {
-    if (error) throw error;
-    res.status(200).json({ success: 1, data: results });
-  });
+  try {
+    pool.query(queries.getUsers, (error, results) => {
+      if (error) throw error;
+      res.status(200).json({ success: 1, data: results });
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const getUserById = (req, res) => {
-  const UserId = parseInt(req.params.id);
-  pool.query(queries.getUserById, [UserId], (error, results) => {
-    if (error) throw error;
-    res.status(200).json({ success: 1, data: results });
-  });
+  try {
+    const UserId = parseInt(req.params.id);
+    pool.query(queries.getUserById, [UserId], (error, results) => {
+      if (error) throw error;
+      res.status(200).json({ success: 1, data: results });
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const addUser = (req, res) => {
@@ -24,62 +32,71 @@ const addUser = (req, res) => {
   const password = bcrypt.hashSync(req.body.password, salt);
   const { name, phone, looking_for, country } = req.body;
 
-  pool.query(queries.checkPhoneExists, [phone], (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: "Internal server error" });
-      req.end();
-    }
-
-    if (results && results.length > 0) {
-      return res
-        .status(409)
-        .json({ success: 0, data: "Phone number already exists" });
-      req.end();
-    }
-  });
-
-  pool.query(
-    queries.addUser,
-    [name, phone, password, looking_for, country],
-    (error, results) => {
+  try {
+    pool.query(queries.checkPhoneExists, [phone], (error, results) => {
       if (error) throw error;
-      res
-        .status(201)
-        .json({ success: 1, data: "Account created successfully" });
-    }
-  );
+
+      if (results && results.length > 0) {
+        return res
+          .status(409)
+          .json({ success: 0, data: "Phone number already exists" });
+      }
+
+      pool.query(
+        queries.addUser,
+        [name, phone, password, looking_for, country],
+        (error, results) => {
+          if (error) throw error;
+          res
+            .status(200)
+            .json({ success: 1, data: "Account created successfully" });
+        }
+      );
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const deactivateAccount = (req, res) => {
   const UserId = parseInt(req.params.id);
   const date_closed = new Date();
   const { reason_for_closing } = req.body;
-  pool.query(
-    queries.deactivateAccount,
-    [reason_for_closing, date_closed, UserId],
-    (error, results) => {
-      if (error) throw error;
-      res
-        .status(200)
-        .json({ success: 1, data: "Account deactivated successfully" });
-    }
-  );
+  try {
+    pool.query(
+      queries.deactivateAccount,
+      [reason_for_closing, date_closed, UserId],
+      (error, results) => {
+        if (error) throw error;
+        res
+          .status(200)
+          .json({ success: 1, data: "Account deactivated successfully" });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ success: 0, data: "Could not deactivate account" });
+  }
 };
 
 const activateAccount = (req, res) => {
   const UserId = parseInt(req.params.id);
   const date_reopened = new Date();
   const { reason_for_reopening } = req.body;
-  pool.query(
-    queries.deactivateAccount,
-    [reason_for_reopening, date_reopened, UserId],
-    (error, results) => {
-      if (error) throw error;
-      res
-        .status(200)
-        .json({ success: 1, data: "Account Re-Adeactivated successfully" });
-    }
-  );
+  try {
+    pool.query(
+      queries.deactivateAccount,
+      [reason_for_reopening, date_reopened, UserId],
+      (error, results) => {
+        if (error) throw error;
+        res.status(200).json({
+          success: 1,
+          data: "Account Re-activated successfully",
+        });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ success: 0, data: "Could not reactivate account" });
+  }
 };
 
 const updateProfile = (req, res) => {
@@ -103,54 +120,65 @@ const updateProfile = (req, res) => {
     hobies,
     profession,
     church,
+    preferences,
   } = req.body;
-  pool.query(
-    queries.updateProfile,
-    [
-      name,
-      email,
-      gender,
-      looking_for,
-      age_from,
-      age_to,
-      dob,
-      register_date,
-      about,
-      location,
-      country,
-      district,
-      m_status,
-      dating_type,
-      hobies,
-      profession,
-      church,
-      date_updated,
-      UserId,
-    ],
-    (error, results) => {
-      if (error) throw error;
-      res
-        .status(200)
-        .json({ success: 1, data: "Profile Updated successfully" });
-    }
-  );
+  try {
+    pool.query(
+      queries.updateProfile,
+      [
+        name,
+        email,
+        gender,
+        looking_for,
+        age_from,
+        age_to,
+        dob,
+        register_date,
+        about,
+        location,
+        country,
+        district,
+        m_status,
+        dating_type,
+        hobies,
+        profession,
+        church,
+        date_updated,
+        preferences,
+        UserId,
+      ],
+      (error, results) => {
+        if (error) throw error;
+        res
+          .status(200)
+          .json({ success: 1, data: "Profile Updated successfully" });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ success: 0, data: "Could not update profile" });
+  }
 };
 
 const addActivations = (userId, dateFrom, dateTo, amount) => {
-  pool.query(
-    queries.addActivations,
-    [userId, date_activated, dateFrom, dateTo, amount],
-    (error, results) => {
-      if (error) {
-        return res
-          .status(500)
-          .json({ success: 0, data: "Could not add activation" });
+  try {
+    pool.query(
+      queries.addActivations,
+      [userId, date_activated, dateFrom, dateTo, amount],
+      (error, results) => {
+        if (error) {
+          return res.status(500).json({
+            success: 0,
+            data: "Could not add activation",
+          });
+        }
+        res
+          .status(200)
+          .json({ success: 1, data: "Account activated successfully" });
       }
-      res
-        .status(200)
-        .json({ success: 1, data: "Account activated successfully" });
-    }
-  );
+    );
+  } catch (error) {
+    res.status(500).json({ success: 0, data: "Could not add activation" });
+  }
 };
 
 const updatePassword = (req, res) => {
