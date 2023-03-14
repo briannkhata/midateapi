@@ -1,8 +1,32 @@
 const pool = require("../../db");
 const queries = require("./queries");
 const multer = require("multer");
+const path = require("path");
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + path.extname(file.originalname));
+  },
+});
+
+const uploadProfile = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB (in bytes)
+  },
+});
+const uploadPhotos = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB (in bytes)
+  },
+});
 
 const getUsers = (req, res) => {
   try {
@@ -226,48 +250,71 @@ const addPayment = async (req, res) => {
   }
 };
 
-// handle storage using multer
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
-});
-
 const updateProfilePicture = (req, res) => {
-  const UserId = parseInt(req.params.id);
+  try {
+    uploadProfile.single("photo")(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        res.status(500).json("There was an error uploading the photo");
+      } else if (err) {
+        res.status(500).json("There was an error uploading the photo");
+      } else {
+        const { filename } = req.file;
+        const { userId } = req.body;
+        pool.query(
+          queries.updateProfilePicture,
+          [filename, userId],
+          (error, results) => {
+            if (error) throw error;
+            res
+              .status(200)
+              .json({
+                success: 1,
+                data: "Profile Picture updated successfully",
+              });
+          }
+        );
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Internal Server Error");
+  }
+};
 
-  upload.single("photo")(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      res.status(500).json("There was an error uploading the photo");
-    } else if (err) {
-      res.status(500).json("There was an error uploading the photo");
-    } else {
-      const { filename } = req.file.filename;
-      pool.query(
-        queries.updateProfilePicture,
-        [filename, UserId],
-        (error, results) => {
+const addPhotos = (req, res) => {
+  try {
+    uploadProfile.single("photo")(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        res.status(500).json("There was an error uploading the photo");
+      } else if (err) {
+        res.status(500).json("There was an error uploading the photo");
+      } else {
+        const { filename } = req.file;
+        const { userId } = req.body;
+        pool.query(queries.addPhotos, [userId, filename], (error, results) => {
           if (error) throw error;
           res
             .status(200)
-            .json({ success: 1, data: "Profile Picture updated successfully" });
-        }
-      );
-    }
-  });
+            .json({ success: 1, data: "Photo added successfully" });
+        });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Internal Server Error");
+  }
 };
 
 const logoutUser = (req, res) => {
-  req.session.destroy((err) => {
-    if (error) throw error;
-    res.redirect("/");
-  });
+  try {
+    req.session.destroy((err) => {
+      if (err) throw err;
+      res.redirect("/");
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Internal Server Error");
+  }
 };
 
 const loginUser = (req, res) => {
@@ -375,31 +422,57 @@ const searchUsers = (req, res) => {
 };
 
 const likeUser = (req, res) => {
-  const liked_by = req.session.UserId;
-  const { liked, operation } = req.body;
-  pool.query(
-    queries.likeUser,
-    [liked, liked_by, operation],
-    (error, results) => {
-      if (error) throw error;
-      res.status(200).json({ success: 1, data: "User Liked successfully" });
-    }
-  );
+  try {
+    const liked_by = req.session.UserId;
+    const { liked, operation } = req.body;
+    pool.query(
+      queries.likeUser,
+      [liked, liked_by, operation],
+      (error, results) => {
+        if (error) throw error;
+        res.status(200).json({ success: 1, data: "User Liked successfully" });
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: 0, message: "Server error" });
+  }
 };
-
 const getUserLikes = (req, res) => {
-  const UserId = parseInt(req.params.id);
-  pool.query(queries.getUserLikes, [UserId], (error, results) => {
-    if (error) throw error;
-    res.status(200).json({ success: 1, data: results });
-  });
+  try {
+    const UserId = parseInt(req.params.id);
+    pool.query(queries.getUserLikes, [UserId], (error, results) => {
+      if (error) throw error;
+      res.status(200).json({ success: 1, data: results });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: 0, message: "Server error" });
+  }
 };
 
 const getPlans = (req, res) => {
-  pool.query(queries.getPlans, (error, results) => {
-    if (error) throw error;
-    res.status(200).json({ success: 1, data: results });
-  });
+  try {
+    pool.query(queries.getPlans, (error, results) => {
+      if (error) throw error;
+      res.status(200).json({ success: 1, data: results });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: 0, message: "Server error" });
+  }
+};
+
+const getAds = (req, res) => {
+  try {
+    pool.query(queries.getAds, (error, results) => {
+      if (error) throw error;
+      res.status(200).json({ success: 1, data: results });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: 0, message: "Server error" });
+  }
 };
 
 module.exports = {
@@ -426,4 +499,6 @@ module.exports = {
   getPlanPrice,
   getPlanDays,
   addActivations,
+  getAds,
+  addPhotos,
 };
