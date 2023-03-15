@@ -383,11 +383,41 @@ const setToOffline = (req, res) => {
 };
 
 const getDateTo = (req, res) => {
-  pool.query(queries.getDateTo, (error, results) => {
-    if (error) throw error;
-    res.status(201).json(results);
-  });
+  try {
+    pool.query(queries.getDateTo, (error, results) => {
+      if (error) throw error;
+      res.status(201).json(results);
+    });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
+
+// const getPhoto = (req, res, photo_id) => {
+//   try {
+//     pool.query(queries.getPhoto, [photo_id], (error, results) => {
+//       res.status(200).json(results);
+//     });
+//   } catch (error) {
+//     console.error('An error occurred:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// };
+
+// const setProfilePhoto = (req, res) => {
+//   try {
+//     const { user_id,photo_id } = req.body;
+//     const photo = getPhoto(photo_id);
+//     pool.query(queries.setProfilePhoto, [photo,user_id], (error, results) => {
+//       if (error) throw error;
+//       res.status(200).json(results);
+//     });
+//   } catch (error) {
+//     console.error('An error occurred:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// };
 
 const resetPayment = (req, res) => {
   const today = new Date();
@@ -501,4 +531,6 @@ module.exports = {
   addActivations,
   getAds,
   addPhotos,
+  getPhoto,
+  setProfilePhoto
 };

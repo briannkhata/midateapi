@@ -1,4 +1,4 @@
-const getUsers = "SELECT * FROM tblusers WHERE deleted = 0";
+const getUsers = "SELECT * FROM tblusers WHERE deleted = 0 ORDER BY RAND()";
 const getUserById = "SELECT * FROM tblusers WHERE user_id = ? AND deleted = 0";
 const checkPhoneExists = "SELECT * FROM tblusers WHERE phone = ? AND deleted = 0";
 const addUser = "INSERT INTO tblusers (name, phone, password, country)  VALUES (?,?,?,?)";
@@ -23,6 +23,9 @@ const getPlanDays = "SELECT days FROM tblplans WHERE plan_id = ?";
 const addActivations = "INSERT INTO tblactivations (date_activated, date_from,date_to,user_id,amount) VALUES (?,?,?,?,?)";
 const getAds = "SELECT * FROM tblads WHERE deleted = 0";
 const addPhotos = "INSERT INTO tblphotos (user_id, photo)  VALUES (?,?)";
+const getPhoto = "SELECT photo FROM tblphotos WHERE photo_id = ?";
+const setProfilePhoto = "UPDATE tblusers SET photo = ? WHERE user_id = ?";
+
 
 
 
@@ -51,5 +54,7 @@ module.exports = {
   getPlanDays,
   addActivations,
   getAds,
-  addPhotos
+  addPhotos,
+  getPhoto,
+  setProfilePhoto
 };

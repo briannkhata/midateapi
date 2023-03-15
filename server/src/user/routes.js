@@ -22,9 +22,13 @@ user.post("/likeUser/", controller.likeUser);
 user.post("/logoutUser/", controller.logoutUser);
 user.post("/addActivations/", controller.addActivations);
 user.post("/addPhotos/", controller.addPhotos);
+user.post("/getPhoto/", controller.getPhoto);
+
 
 
 user.put("/deactivateAccount/:id", controller.deactivateAccount);
+user.put("/setProfilePhoto/", controller.setProfilePhoto);
+
 user.put("/activateAccount/:id", controller.activateAccount);
 user.put("/updateProfile/:id", controller.updateProfile);
 user.put("/updatePassword/:id", controller.updatePassword);
