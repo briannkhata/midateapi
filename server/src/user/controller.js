@@ -530,7 +530,7 @@ module.exports = {
   getPlanDays,
   addActivations,
   getAds,
-  addPhotos,
-  getPhoto,
-  setProfilePhoto
+  addPhotos
+  // getPhoto,
+  // setProfilePhoto
 };
