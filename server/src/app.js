@@ -12,8 +12,8 @@ app.use(
 );
 
 const PORT = process.env.PORT || 3000;
-const userRoutes = require("./src/user/routes");
-const chatRoutes = require("./src/chat/routes");
+const userRoutes = require("./user/routes");
+const chatRoutes = require("./chat/routes");
 
 app.use(express.json());
 
